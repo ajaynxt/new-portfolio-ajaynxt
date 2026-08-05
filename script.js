@@ -308,6 +308,91 @@
   }
 
   /* Escape closes dialogs */
+  })();  /* ── Core Web Vitals monitoring ── */
+  const cwvDebug = location.hostname === 'localhost' || location.search.includes('vitals=1');
+  const cwvKey = 'ajaynxt_cwv_history';
+  const cwvMax = 50;
+  const cwvThresholds = {
+    LCP: { good: 2500, poor: 4000 },
+    INP: { good: 200, poor: 500 },
+    CLS: { good: 0.1, poor: 0.25 },
+    FCP: { good: 1800, poor: 3000 },
+    TTFB: { good: 800, poor: 1800 }
+  };
+
+  const cwvRating = (name, value) => {
+    const t = cwvThresholds[name];
+    if (!t) return 'unknown';
+    if (value <= t.good) return 'good';
+    if (value <= t.poor) return 'needs-improvement';
+    return 'poor';
+  };
+
+  const cwvSave = (entry) => {
+    try {
+      const list = JSON.parse(localStorage.getItem(cwvKey) || '[]');
+      list.push(entry);
+      while (list.length > cwvMax) list.shift();
+      localStorage.setItem(cwvKey, JSON.stringify(list));
+    } catch (_) {}
+  };
+
+  const cwvReport = (metric) => {
+    const value = metric.name === 'CLS'
+      ? Math.round(metric.value * 1000) / 1000
+      : Math.round(metric.value);
+    const entry = {
+      name: metric.name,
+      value,
+      rating: metric.rating || cwvRating(metric.name, metric.value),
+      id: metric.id,
+      path: location.pathname,
+      ts: Date.now()
+    };
+    if (cwvDebug) {
+      const c = entry.rating === 'good' ? '#0a0' : entry.rating === 'poor' ? '#c00' : '#c80';
+      console.log(`%c[CWV] ${entry.name}: ${entry.value}${metric.name === 'CLS' ? '' : 'ms'} (${entry.rating})`, `color:${c};font-weight:bold`);
+    }
+    window.__cwv = window.__cwv || {};
+    window.__cwv[entry.name] = entry;
+    cwvSave(entry);
+    if (typeof gtag === 'function') {
+      gtag('event', entry.name, {
+        event_category: 'Web Vitals',
+        value: entry.name === 'CLS' ? Math.round(entry.value * 1000) : entry.value,
+        metric_rating: entry.rating,
+        non_interaction: true
+      });
+    }
+  };
+
+  const cwvStart = () => {
+    import('https://unpkg.com/web-vitals@4/dist/web-vitals.js')
+      .then(({ onLCP, onINP, onCLS, onFCP, onTTFB }) => {
+        onLCP(cwvReport);
+        onINP(cwvReport);
+        onCLS(cwvReport);
+        onFCP(cwvReport);
+        onTTFB(cwvReport);
+      })
+      .catch(() => {
+        try {
+          const nav = performance.getEntriesByType('navigation')[0];
+          if (nav) cwvReport({ name: 'TTFB', value: nav.responseStart, id: 'ttfb-fb' });
+        } catch (_) {}
+      });
+  };
+
+  if ('requestIdleCallback' in window) requestIdleCallback(cwvStart, { timeout: 3000 });
+  else setTimeout(cwvStart, 1);  /* Escape closes dialogs */
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') document.querySelectorAll('dialog[open]').forEach((d) => d.close());
+  });
+
+  /* ── Core Web Vitals monitoring ── */
+  // ... upar wala pura block yahan ...
+
+})();
   document.addEventListener('keydown', (e) => {
     if (e.key === 'Escape') document.querySelectorAll('dialog[open]').forEach((d) => d.close());
   });
