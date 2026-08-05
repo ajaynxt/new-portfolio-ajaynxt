@@ -1,0 +1,9 @@
+{
+  "name": "AJAY NXT Portfolio",
+  "short_name": "AJAY NXT",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#fbf8f1",
+  "theme_color": "#fbf8f1",
+  "icons": [{"src":"assets/favicon.png","sizes":"128x128","type":"image/png"}]
+}
