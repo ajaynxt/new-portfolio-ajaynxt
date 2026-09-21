@@ -1,0 +1,162 @@
+/* AJAYNXT Motion Layer
+   Lightweight, dependency-free motion inspired by modern component libraries.
+   Designed to sit on top of the existing editorial AJAYNXT site.
+*/
+.rb-upgrade {
+  --rb-bg: #fbf8f1;
+  --rb-ink: #080d13;
+  --rb-muted: #66707a;
+  --rb-accent: #cf694d;
+  --rb-accent-soft: rgba(207,105,77,.12);
+  --rb-line: rgba(8,13,19,.12);
+  --rb-ease: cubic-bezier(.22,1,.36,1);
+}
+
+.rb-scroll-progress {
+  position: fixed;
+  z-index: 10001;
+  inset: 0 auto auto 0;
+  width: 100%;
+  height: 2px;
+  transform-origin: 0 50%;
+  transform: scaleX(0);
+  background: var(--rb-accent);
+  pointer-events: none;
+}
+
+.rb-word {
+  display: inline-block;
+  opacity: 0;
+  transform: translate3d(0,.72em,0) rotateX(-16deg);
+  transform-origin: 50% 100%;
+  transition: opacity .72s var(--rb-ease), transform .86s var(--rb-ease);
+  will-change: transform, opacity;
+}
+.rb-split-ready .rb-word { opacity: 1; transform: none; }
+.rb-split-ready .rb-word:nth-child(2n) { transition-delay: .035s; }
+.rb-split-ready .rb-word:nth-child(3n) { transition-delay: .07s; }
+.rb-split-ready .rb-word:nth-child(4n) { transition-delay: .11s; }
+
+.rb-reveal {
+  opacity: 0;
+  transform: translate3d(0,26px,0);
+  transition: opacity .8s var(--rb-ease), transform .9s var(--rb-ease);
+}
+.rb-reveal.rb-visible { opacity: 1; transform: none; }
+.rb-reveal[data-rb-delay="1"] { transition-delay: .08s; }
+.rb-reveal[data-rb-delay="2"] { transition-delay: .16s; }
+.rb-reveal[data-rb-delay="3"] { transition-delay: .24s; }
+
+.rb-spotlight {
+  --rb-x: 50%;
+  --rb-y: 50%;
+  position: relative;
+  isolation: isolate;
+  overflow: hidden;
+}
+.rb-spotlight::after {
+  content: "";
+  position: absolute;
+  inset: -1px;
+  z-index: -1;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity .35s ease;
+  background: radial-gradient(circle 170px at var(--rb-x) var(--rb-y), rgba(207,105,77,.14), transparent 68%);
+}
+.rb-spotlight:hover::after { opacity: 1; }
+
+.rb-tilt {
+  --rb-rx: 0deg;
+  --rb-ry: 0deg;
+  transform: perspective(1100px) rotateX(var(--rb-rx)) rotateY(var(--rb-ry));
+  transform-style: preserve-3d;
+  transition: transform .55s var(--rb-ease), box-shadow .55s var(--rb-ease);
+}
+.rb-tilt:hover {
+  box-shadow: 0 22px 55px rgba(8,13,19,.12);
+}
+
+.rb-magnetic {
+  will-change: transform;
+  transition: transform .35s var(--rb-ease);
+}
+
+.rb-upgrade .browser-card,
+.rb-upgrade .film-card,
+.rb-upgrade .service-grid article,
+.rb-upgrade .about-copy,
+.rb-upgrade .global-points > div {
+  border-radius: 18px;
+}
+
+.rb-upgrade .browser-card {
+  box-shadow: 0 12px 35px rgba(8,13,19,.08);
+}
+
+.rb-upgrade .service-grid article,
+.rb-upgrade .global-points > div {
+  transition: transform .45s var(--rb-ease), border-color .45s ease, background-color .45s ease;
+}
+
+.rb-upgrade .service-grid article:hover,
+.rb-upgrade .global-points > div:hover {
+  transform: translateY(-5px);
+  border-color: rgba(207,105,77,.3);
+}
+
+.rb-upgrade .hero h1 mark,
+.rb-upgrade .section-head h2 mark {
+  text-decoration-thickness: .07em;
+  text-underline-offset: .08em;
+}
+
+.rb-upgrade .hero-copy > .label span,
+.rb-upgrade .section-head .label span {
+  transition: transform .6s var(--rb-ease);
+}
+.rb-upgrade .hero-copy:hover > .label span,
+.rb-upgrade .section-head:hover .label span {
+  transform: scaleX(1.6);
+}
+
+.rb-active-nav {
+  position: relative;
+}
+.rb-active-nav::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -.45rem;
+  height: 1.5px;
+  border-radius: 999px;
+  background: var(--rb-accent);
+  transform-origin: left;
+  animation: rb-nav-in .45s var(--rb-ease);
+}
+@keyframes rb-nav-in { from { transform: scaleX(0); } to { transform: scaleX(1); } }
+
+@media (max-width: 760px) {
+  .rb-upgrade .browser-card,
+  .rb-upgrade .film-card,
+  .rb-upgrade .service-grid article,
+  .rb-upgrade .about-copy,
+  .rb-upgrade .global-points > div {
+    border-radius: 14px;
+  }
+  .rb-tilt {
+    transform: none !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .rb-scroll-progress { display: none; }
+  .rb-word,
+  .rb-reveal {
+    opacity: 1 !important;
+    transform: none !important;
+    transition: none !important;
+  }
+  .rb-tilt { transform: none !important; }
+}
