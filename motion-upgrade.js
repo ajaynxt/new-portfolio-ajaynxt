@@ -32,7 +32,7 @@
     while (walker.nextNode()) nodes.push(walker.currentNode);
     nodes.forEach((node) => {
       const frag = document.createDocumentFragment();
-      node.nodeValue.trim().split(/(\s+)/).forEach((part) => {
+      node.nodeValue.split(/(\\s+)/).forEach((part) => {
         if (/^\s+$/.test(part)) {
           frag.appendChild(document.createTextNode(part));
         } else {
